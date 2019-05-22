@@ -10,7 +10,6 @@ module ShopifyAPI
         begin
           if ShopifyAPI.credit_below?(THROTTLE_MIN_CREDIT)
             sleep_for = [[THROTTLE_MIN_CREDIT - ShopifyAPI.credit_left, THROTTLE_RETRY_AFTER].min, 2].max
-            puts "DEBUG: THROTTLE_MIN_CREDIT=#{THROTTLE_MIN_CREDIT}, THROTTLE_RETRY_AFTER=#{THROTTLE_RETRY_AFTER}, ShopifyAPI.credit_left=#{ShopifyAPI.credit_left}"
             puts "Credit Maxed: #{ShopifyAPI.credit_left}/#{ShopifyAPI.credit_limit}, sleeping for #{sleep_for} seconds"
             sleep sleep_for
             
