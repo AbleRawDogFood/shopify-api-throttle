@@ -4,20 +4,21 @@ module ShopifyAPI
       THROTTLE_RETRY_AFTER = 10
       THROTTLE_RETRY_MAX = 5
       THROTTLE_MIN_CREDIT = 5
-
+      
       def throttle(&block)
         retried = 0
         begin
           if ShopifyAPI.credit_below?(THROTTLE_MIN_CREDIT)
-            sleep_for = [[THROTTLE_MIN_CREDIT - ShopifyAPI.credit_left, THROTTLE_RETRY_AFTER].min, 1].max
+            sleep_for = [[THROTTLE_MIN_CREDIT - ShopifyAPI.credit_left, THROTTLE_RETRY_AFTER].min, 2].max
+            puts "DEBUG: THROTTLE_MIN_CREDIT=#{THROTTLE_MIN_CREDIT}, THROTTLE_RETRY_AFTER=#{THROTTLE_RETRY_AFTER}, ShopifyAPI.credit_left=#{ShopifyAPI.credit_left}"
             puts "Credit Maxed: #{ShopifyAPI.credit_left}/#{ShopifyAPI.credit_limit}, sleeping for #{sleep_for} seconds"
             sleep sleep_for
-
+            
             if $shopify_store and $shopify_store.respond_to? :on_throttled # Use this to call back into your application to update something
               $shopify_store.on_throttled
             end
           end
-
+          
           yield
         rescue ActiveResource::ResourceNotFound, ActiveResource::BadRequest, ActiveResource::UnauthorizedAccess,
                ActiveResource::ForbiddenAccess, ActiveResource::MethodNotAllowed, ActiveResource::ResourceGone,
